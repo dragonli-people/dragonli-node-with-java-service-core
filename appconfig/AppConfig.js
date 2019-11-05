@@ -7,6 +7,10 @@ const DbService = require('../generalservices/DbService');
 const OtherService = require('../generalservices/OtherService');
 const WebSocketService = require('../generalservices/WebSocketService');
 const ZookeeperService = require('../generalservices/ZookeeperService');
+const AuthReadFilter = require('../filters/AuthReadFilter');
+const AuthWriteFilter = require('../filters/AuthWriteHandler');
+const GeneralErrorAdvice = require('../advices/GeneralErrorAdvice');
+const GeneralResultFormatAdvice = require('../advices/GeneralResultFormatAdvice');
 
 module.exports = class extends AppConfig {
     constructor(){
@@ -28,6 +32,15 @@ module.exports = class extends AppConfig {
             new AppInitRegistServiceHandler('websocketService' ,'InvokeService',WebSocketService),
             new AppInitRegistServiceHandler('zookeeperService' ,'InvokeService',ZookeeperService),
         ]);
+
+        this.addControllerFilterHandlers([
+            new AuthReadFilter('authReader','authService','id','passwd',null),//findUserFunc will set at app.js
+        ]);
+        this.addControllerAfterHandlers([new AuthWriteFilter('authWriter',4320000)]),
+
+        this.setControllerResultAdvice([new GeneralResultFormatAdvice('MESSAGE_BODY','auth','user')]);
+        this.setControllerErrorAdvice(new GeneralErrorAdvice(
+            'err.ejs','errCode','message','exception','auth','user'));
 
         this.addControllerIocKeys(['redisHandler','InvokeService'
             ,'authService','dbService','otherService','websocketService','zookeeperService']);
