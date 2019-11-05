@@ -8,6 +8,7 @@ const OtherService = require('../generalservices/OtherService');
 const WebSocketService = require('../generalservices/WebSocketService');
 const ZookeeperService = require('../generalservices/ZookeeperService');
 const AuthReadFilter = require('../filters/AuthReadFilter');
+const RoleFilter = require('../filters/RoleFilter');
 const AuthWriteFilter = require('../filters/AuthWriteHandler');
 const GeneralErrorAdvice = require('../advices/GeneralErrorAdvice');
 const GeneralResultFormatAdvice = require('../advices/GeneralResultFormatAdvice');
@@ -35,6 +36,7 @@ module.exports = class extends AppConfig {
 
         this.addControllerFilterHandlers([
             new AuthReadFilter('authReader','authService','id','passwd',null),//findUserFunc will set at app.js
+            new RoleFilter('roleFilter','GUEST','USER',0),
         ]);
         this.addControllerAfterHandlers([new AuthWriteFilter('authWriter',4320000)]),
 

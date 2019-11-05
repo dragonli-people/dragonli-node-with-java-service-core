@@ -1,6 +1,7 @@
 const {AppWithExpress,ExceptoinWithErrorCode} = require('dragonli-node-service-core');
 const AppConfig = require('./appconfig/AppConfig');
 const AuthReadFilter = require('./filters/AuthReadFilter')
+const RoleFilter = require('./filters/RoleFilter')
 
 class Controller1 {
     async index(){
@@ -41,6 +42,10 @@ class Controller1 {
         a.doSth();
         return {};
     }
+
+    async testRole(){
+        return {message: 'ok'};
+    }
 }
 
 const routerConf = [
@@ -50,6 +55,7 @@ const routerConf = [
     {url:'/testSetUser',clz:Controller1,method:'testSetUser'},
     {url:'/errWithCode',clz:Controller1,method:'errWithCode'},
     {url:'/generalError',clz:Controller1,method:'generalError'},
+    {url:'/testRole',clz:Controller1,method:'testRole',roles:'ADMIN'},
 ];
 
 
@@ -64,6 +70,10 @@ config.appBeforeStartReady = (app,DATA_POOL,CONFIG_POOL)=> {
     AuthReadFilter.createAndSetFindUserFunc('dbService', 'authReader'
         , (dbService, uid, auth) => dbService.get('db1', 'user', uid)
         , app, DATA_POOL, CONFIG_POOL);
+
+    // RoleFilter.createUserRoleFunc(app,DATA_POOL,CONFIG_POOL,'roleFilter'
+    //     ,(user,guestRoleName,generalUserRoleName,dbService)=>dbService.list('db1','role',' and user_id=? ',[user.id])
+    //     ,'dbService');
 }
 /*
 // or simple ( there is only one thing in appBeforeStartReady ) :
