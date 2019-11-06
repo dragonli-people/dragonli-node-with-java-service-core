@@ -1,3 +1,5 @@
+require('dragonli-node-tools');
+
 
 module.exports = {
     defaultInterfaceName: 'org.dragonli.service.general.interfaces.general.DbService',
@@ -30,5 +32,23 @@ module.exports = {
 
     exec: (dbName,query,paras)=>({parasType:['string','string','array(object)'],resultType:'array(object)'}),
     batchUpdate: (dbName,sqls)=>({parasType:['string','array(string)'],resultType:'array(object)'}),
+
+    join: ()=>(async function (list, leftKey, newField, dbName,table, rightKey, dir = 'left', autoCloneRight = true)
+    {
+        var leftKeyValues = list.map(v=>v[leftKey]).filter(v=>v);
+        leftKeyValues = [...new Set(leftKeyValues)];
+        list.forEach(v=>v[newField]=null);
+        if(leftKeyValues.length === 0)return list;
+        var otherList = await this.multiGet(dbName,table,leftKeyValues);
+        list.joinList(otherList,leftKey,rightKey,newField,dir,autoCloneRight);
+        return list;
+    }),
+    leftJoin: ()=>(function (list, leftKey, newField,dbName, table, rightKey,autoCloneRight=true) {
+        return this.join(list, leftKey, newField, dbName,table, rightKey,'left',autoCloneRight);
+    }),
+    rightJoin: ()=>(function (list, leftKey, newField,dbName, table, rightKey,autoCloneRight=true) {
+        return this.join(list, leftKey, newField, dbName,table, rightKey,'right',autoCloneRight);
+    }),
 }
+
 

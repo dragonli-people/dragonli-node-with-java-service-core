@@ -1,4 +1,4 @@
-const {AppConfig,AppInitRedisHandler} = require('dragonli-node-general-service-core');
+const {AppConfig,AppInitRedisHandler,AppInitMysqlHandler} = require('dragonli-node-general-service-core');
 const EvnServerConfig = require('../appconfighandlers/EvnServerConfig');
 const AppInitInvokerServiceHandler = require('../servicesupport/AppInitInvokerServiceHandler');
 const AppInitRegistServiceHandler = require('../generalservices/AppInitRegistServiceHandler');

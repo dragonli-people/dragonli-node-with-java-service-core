@@ -1,4 +1,5 @@
 const {AppWithExpress,ExceptoinWithErrorCode} = require('dragonli-node-service-core');
+const {AppInitMysqlHandler} = require('dragonli-node-general-service-core')
 const AppConfig = require('./appconfig/AppConfig');
 const AuthReadFilter = require('./filters/AuthReadFilter')
 const RoleFilter = require('./filters/RoleFilter')
@@ -49,6 +50,18 @@ class Controller1 {
     async testRole(){
         return {message: 'ok'};
     }
+
+    async join1(){
+        var list = await this.dbService.list('db2','message','',[]);
+        list = await this.dbService.leftJoin(list, 'user_id', 'user','db1', 'user', 'id');
+        return {list};
+    }
+
+    async join2(){
+        var list = await this.db2Handler.query('select * from message order by id');
+        list = await this.db1Handler.leftJoin(list, 'user_id', 'user', 'user', 'id');
+        return {list};
+    }
 }
 
 const routerConf = [
@@ -59,6 +72,8 @@ const routerConf = [
     {url:'/errWithCode',clz:Controller1,method:'errWithCode'},
     {url:'/generalError',clz:Controller1,method:'generalError'},
     {url:'/testRole',clz:Controller1,method:'testRole',roles:'ADMIN'},
+    {url:'/join1',clz:Controller1,method:'join1'},
+    {url:'/join2',clz:Controller1,method:'join2'},
 ];
 
 
@@ -67,7 +82,13 @@ process.env.ENV_SERVICE_CONFIG_URL = process.env.ENV_SERVICE_CONFIG_URL || 'http
 const config = new AppConfig();
 config.setViewFolder('views');
 config.addRoutesConfig(routerConf);
-
+config.addAppInitHandlers([
+    new AppInitMysqlHandler('db1Handler','data-source-configs.db1.data-config.jdbc-url'
+        ,'data-source-configs.db1.data-config.username','data-source-configs.db1.data-config.password'),
+    new AppInitMysqlHandler('db2Handler','data-source-configs.db2.data-config.jdbc-url'
+        ,'data-source-configs.db2.data-config.username','data-source-configs.db2.data-config.password'),
+]);
+config.addControllerIocKeys(['db1Handler','db2Handler']);
 
 config.appBeforeStartReady = (app,DATA_POOL,CONFIG_POOL)=> {
     AuthReadFilter.createAndSetFindUserFunc('dbService', 'authReader'

@@ -10,7 +10,7 @@ module.exports = function (config,invokerServiceFunc,group=null,customizedInterf
         var func = config[name];
         var result = func.call(config);
         if(typeof result === 'function'){
-            generalMethods.push({name,func});
+            generalMethods.push({name,func:result});
             return;
         }
         interfaceMethods.push({name,func});
