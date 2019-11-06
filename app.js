@@ -34,7 +34,10 @@ class Controller1 {
     }
 
     async errWithCode(){
-        throw new ExceptoinWithErrorCode(1024,'1024 error');
+        console.log('paras:',this.paras);
+        this.assert(this.paras.ok,1024,'1024 error...');
+        return {ok:this.paras.ok};
+        // throw new ExceptoinWithErrorCode(1024,'1024 error');
     }
 
     async generalError(){
