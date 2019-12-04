@@ -32,6 +32,7 @@ class  AuthReadFilter{
         this.pkField = pkField;
         this.codeFilter = codeFilter;
         this.findUserFunc = findUserFunc;
+        this.createSetUser = createSetUser;
     }
 
     async doFilter (controller,context,controllerIocKeys, request, response, config, app) {
