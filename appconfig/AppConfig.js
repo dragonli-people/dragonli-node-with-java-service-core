@@ -1,4 +1,4 @@
-const {AppConfig,AppInitRedisHandler,AppInitMysqlHandler} = require('dragonli-node-general-service-core');
+const {AppConfig,AppInitRedisHandler,AppInitMysqlHandler,HttpPortConfig} = require('dragonli-node-general-service-core');
 const EvnServerConfig = require('../appconfighandlers/EvnServerConfig');
 const AppInitInvokerServiceHandler = require('../servicesupport/AppInitInvokerServiceHandler');
 const AppInitRegistServiceHandler = require('../generalservices/AppInitRegistServiceHandler');
@@ -16,9 +16,11 @@ const GeneralResultFormatAdvice = require('../advices/GeneralResultFormatAdvice'
 module.exports = class extends AppConfig {
     constructor(){
         super();
+        this.removeHandlers(HttpPortConfig);
         var envServiceConfigUrl = process.env.ENV_SERVICE_CONFIG_URL || '';
         envServiceConfigUrl && this.addAppInitConfigHandlers(
             [new EvnServerConfig(envServiceConfigUrl,config=>config.propertySources[0].source)]);
+        this.addAppInitConfigHandlers([new HttpPortConfig()]);//for sort
 
         this.addAppInitHandlers([
             new AppInitRedisHandler('redisHandler','REDIS_HOST','REDIS_PORT'
