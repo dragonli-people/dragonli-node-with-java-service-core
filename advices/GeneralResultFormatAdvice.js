@@ -8,7 +8,8 @@ module.exports = class  {
         this.userTag = userTag;
     }
 
-    beforeBodyWrite(result,controller, request, response,context,config,app){
+    beforeBodyWrite(result,controller, request, response,context,controllerIocKeys,config,app){
+        if(config.template)return result;
         var r = {};
         r[this.messageBodyTag] = result;
         r[this.authTag] = context.auth;
