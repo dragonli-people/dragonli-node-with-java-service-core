@@ -49,6 +49,22 @@ module.exports = {
     rightJoin: ()=>(function (list, leftKey, newField,dbName, table, rightKey,autoCloneRight=true) {
         return this.join(list, leftKey, newField, dbName,table, rightKey,'right',autoCloneRight);
     }),
+    page: ()=>(async function (size, page, table, where, where1, limitParas, ...paras) {
+        (!page || page <= 0) && (page = 1);
+        let count = await this.dbService.count( this.firDbName, table, where, limitParas, ...paras) || 0;
+        // console.log('count',count);
+        let pages = Math.ceil(count / size);
+        let sizeEnd = size;
+        let sizeStart = size * (page - 1);
+        let sql = where + where1 + ' limit ?,? ';
+        limitParas.push(sizeStart) && limitParas.push(sizeEnd);
+        // paras.push(limitParas)
+        let list = await this.dbService.list( this.firDbName, table, sql, limitParas, ...paras) || [];
+        let result = {pages, count, size, page};
+        result.arr = list;
+        result.page_length = sizeEnd;
+        return result;
+    }),
 }
 
 
