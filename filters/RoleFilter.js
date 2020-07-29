@@ -31,8 +31,8 @@ class RoleFilter{
         this.guestRoleName = guestRoleName;
         this.generalUserRoleName = generalUserRoleName;
         this.errCode = errCode;
-        this.findRoleFunc = (user,guestRoleName,generalUserRoleName)=>
-            user ? new Set([this.generalUserRoleName]) : new Set([this.guestRoleName]);
+        this.findRoleFunc = findRoleFunc || ( (user,guestRoleName,generalUserRoleName)=>
+            user ? new Set([generalUserRoleName]) : new Set([guestRoleName]) );
     }
 
     async doFilter (controller,context,controllerIocKeys, request, response, config, app) {
