@@ -1,6 +1,6 @@
 {
   "name": "dragonli-node-with-java-service-core",
-  "version": "0.9.8",
+  "version": "0.9.9",
   "description": "node web service base on express. support q request url by one line config and a async functio",
   "main": "index.js",
   "scripts": {
@@ -14,6 +14,6 @@
   "author": "dragonli-people",
   "license": "Apache License 2.0",
   "dependencies": {
-    "dragonli-node-general-service-core": "^0.9.8"
+    "dragonli-node-general-service-core": "^0.9.9"
   }
 }
