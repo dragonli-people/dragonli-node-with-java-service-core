@@ -76,7 +76,6 @@ const routerConf = [
     {url:'/join2',clz:Controller1,method:'join2'},
 ];
 
-
 process.env.HTTP_PORT = 3002;
 process.env.ENV_SERVICE_CONFIG_URL = process.env.ENV_SERVICE_CONFIG_URL || 'http://192.168.7.109:8888/service-config/dev';
 const config = new AppConfig();
@@ -88,17 +87,15 @@ config.addAppInitHandlers([
     new AppInitMysqlHandler('db2Handler','data-source-configs.db2.data-config.jdbc-url'
         ,'data-source-configs.db2.data-config.username','data-source-configs.db2.data-config.password'),
 ]);
+config.addControllerFilterHandlers([
+    new AuthReadFilter('authReader','authService','id',null,
+        ['dbService',async (uid,auth,h)=>await h.getOne('db1','user',uid)]),
+    new RoleFilter('roleFilter','GUEST','USER',0),
+]);
+
 config.addControllerIocKeys(['db1Handler','db2Handler']);
 
-config.appBeforeStartReady = (app,DATA_POOL,CONFIG_POOL)=> {
-    AuthReadFilter.createAndSetFindUserFunc('dbService', 'authReader'
-        , (dbService, uid, auth) => dbService.get('db1', 'user', uid)
-        , app, DATA_POOL, CONFIG_POOL);
-
-    // RoleFilter.createUserRoleFunc(app,DATA_POOL,CONFIG_POOL,'roleFilter'
-    //     ,(user,guestRoleName,generalUserRoleName,dbService)=>dbService.list('db1','role',' and user_id=? ',[user.id])
-    //     ,'dbService');
-}
+config.appBeforeStartReady = (app,DATA_POOL,CONFIG_POOL)=> {}
 /*
 // or simple ( there is only one thing in appBeforeStartReady ) :
 config.appBeforeStartReady = AuthReadFilter.createFindUserFunc(
