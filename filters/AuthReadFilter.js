@@ -13,9 +13,10 @@ function createSetUser(authService,context,pkField='id',codeFilter=null){
 
 class  AuthReadFilter{
 
-    constructor(handlerKey,authServiceVarName,pkField='id',codeFilter='passwd',findUserFunc=null){
+    constructor(handlerKey,authServiceVarName,authTag='auth',pkField='id',codeFilter='passwd',findUserFunc=null){
         this.HANDLER_KEY = handlerKey;
         this.authServiceVarName = authServiceVarName;
+        this.authTag = authTag;
         this.pkField = pkField;
         this.codeFilter = codeFilter;
         this.findUserFunc = findUserFunc;//should be such as : ['mysqlHandler',(uid,auth,mysqlHandler)=>mysqlHandler.getOne('user',uid)]
@@ -25,7 +26,7 @@ class  AuthReadFilter{
     async doFilter (controller,context,controllerIocKeys, request, response, config, app) {
         var authService = this.authServiceVarName && controller[this.authServiceVarName] || null;
         if(!authService)throw new Error('authService cant be null');
-        var user = null,auth = request.cookies.auth ? JSON.parse(request.cookies.auth) : null;
+        var user = null,auth = request.cookies[this.authTag] ? JSON.parse(request.cookies[this.authTag]) : null;
         auth && ( auth = await authService.validateAndRefresh(auth,true,true));
         auth || (auth = await authService.generate('',0,''));
         var codeFilter = this.codeFilter ;
