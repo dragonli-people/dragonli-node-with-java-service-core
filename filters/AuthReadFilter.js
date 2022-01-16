@@ -6,8 +6,8 @@ function createSetUser(authService,context,pkField='id',codeFilter=null){
         context.user = this.user = user;
         context.auth = this.auth = user ?
             await authService.generate('',user[pkField],codeFilter ? codeFilter(user) || '':'')
-            : await authService.generate('',0,'');
-        // console.log('====auth context.auth',context.auth)
+            : await authService.generate('','','');
+        console.log('====auth context.auth',context.user,context.auth)
     }
 }
 
@@ -28,7 +28,7 @@ class  AuthReadFilter{
         if(!authService)throw new Error('authService cant be null');
         var user = null,auth = request.cookies[this.authTag] ? JSON.parse(request.cookies[this.authTag]) : null;
         auth && ( auth = await authService.validateAndRefresh(auth,true,true));
-        auth || (auth = await authService.generate('',0,''));
+        auth || (auth = await authService.generate('','',''));
         var codeFilter = this.codeFilter ;
         if(codeFilter && typeof codeFilter !== 'function' && typeof codeFilter !== 'string')
             throw new Error('codeFilter must be string or function');
@@ -39,10 +39,10 @@ class  AuthReadFilter{
         // if auth.uid is not 0 , it mean that is a user . then validate user exsit and user code is right if need
         auth.uid && this.findUserFunc && ( user = await this.findUser(app,auth.uid,auth) );
         if( auth.uid && this.findUserFunc && !user )
-            auth = await authService.generate('',0,'');//uid>0,need validate,but cant find user
+            auth = await authService.generate('','','');//uid>0,need validate,but cant find user
         if( user && codeFilterResult && ( await codeFilterResult(user) !== auth.code ) ) {
             //such as auth.code === user.passwd
-            auth = await authService.generate('',0,'');
+            auth = await authService.generate('','','');
             user = null;
         }
         context.auth = controller.auth = auth;
