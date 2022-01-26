@@ -7,7 +7,6 @@ function createSetUser(authService,context,pkField='id',codeFilter=null){
         context.auth = this.auth = user ?
             await authService.generate('',user[pkField],codeFilter ? codeFilter(user) || '':'')
             : await authService.generate('','','');
-        console.log('====auth context.auth',context.user,context.auth)
     }
 }
 
