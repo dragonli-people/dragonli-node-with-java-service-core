@@ -17,6 +17,7 @@ class  AuthReadFilter{
         this.authServiceVarName = authServiceVarName;
         this.authTag = authTag;
         this.pkField = pkField;
+        this.headerAuthTag = 'authorizationjsoninfo';// 待优化
         this.codeFilter = codeFilter;
         this.findUserFunc = findUserFunc;//should be such as : ['mysqlHandler',(uid,auth,mysqlHandler)=>mysqlHandler.getOne('user',uid)]
         // this.createSetUser = createSetUser;
@@ -25,7 +26,13 @@ class  AuthReadFilter{
     async doFilter (controller,context,controllerIocKeys, request, response, config, app) {
         var authService = this.authServiceVarName && controller[this.authServiceVarName] || null;
         if(!authService)throw new Error('authService cant be null');
-        var user = null,auth = request.cookies[this.authTag] ? JSON.parse(request.cookies[this.authTag]) : null;
+        var user = null,auth = null ;
+        //  console.log('debug233 auth str',Object.keys( request.headers), request.headers[this.headerAuthTag]);
+        auth = [ 
+            request.cookies[this.authTag] && JSON.parse(request.cookies[this.authTag]) ,
+            request.headers[this.headerAuthTag] && JSON.parse(request.headers[this.headerAuthTag]) ,
+        ].find(v=>v) || null;
+        // console.log('debug233 auth',auth);
         auth && ( auth = await authService.validateAndRefresh(auth,true,true));
         auth || (auth = await authService.generate('','',''));
         var codeFilter = this.codeFilter ;
